@@ -4,7 +4,6 @@ const $ = selector => document.querySelector(selector);
 function syncThemeToggle() {
   const light = document.documentElement.dataset.theme === 'light';
   $('#theme-toggle').setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
-  $('#theme-label').textContent = light ? 'Dark mode' : 'Light mode';
   $('#theme-icon').textContent = light ? '☾' : '☀';
 }
 $('#theme-toggle').addEventListener('click', () => {
@@ -139,7 +138,7 @@ $('#reservation-form').addEventListener('submit', event => {
   state.reservations.push(reservation);
   const saved = persist();
   form.reset(); refreshTables(); renderSearch(); invalidateReport();
-  announce(`Reservation ${reservation.id} saved${saved ? ' in this browser' : ' for this session only (storage unavailable)'}. Pending payment: the demo hold expires in 15 minutes. No payment or confirmation email was sent.`);
+  announce(`Reservation ${reservation.id} saved${saved ? ' in this browser' : ' for this session only (storage unavailable)'}. Pending payment: the table hold expires in 15 minutes. No payment or confirmation email was sent.`);
   $('#notice').scrollIntoView({behavior:'smooth',block:'start'});
 });
 $('#account-form').addEventListener('submit', event => {
@@ -148,15 +147,15 @@ $('#account-form').addEventListener('submit', event => {
     const f = form.elements;
     if (f.password.value !== f.confirm.value) f.confirm.setCustomValidity('The passwords must match.');
     if (f.password.value && f.password.value.length < 12) f.password.setCustomValidity('Use at least 12 characters.');
-    if (state.accounts.some(a => a.email.toLowerCase() === f.email.value.toLowerCase() && a.id !== f.id.value)) f.email.setCustomValidity('An account already uses this email address.');
+    if (state.accounts.some(a => a.email.toLowerCase() === f.email.value.toLowerCase() && a.id !== f.namedItem('accountId').value)) f.email.setCustomValidity('An account already uses this email address.');
     if (f.branch.value === 'Both branches' && f.role.value !== 'System Administrator / Owner') f.branch.setCustomValidity('Staff and branch managers must be assigned to one branch.');
   })) return;
-  const data = dataOf(form), editing = Boolean(data.id);
-  const account = {id:data.id || crypto.randomUUID(),first:data.first,last:data.last,email:data.email,role:data.role,branch:data.branch,status:data.status};
+  const data = dataOf(form), editing = Boolean(data.accountId);
+  const account = {id:data.accountId || crypto.randomUUID(),first:data.first,last:data.last,email:data.email,role:data.role,branch:data.branch,status:data.status};
   const index = state.accounts.findIndex(a => a.id === account.id);
   if (index >= 0) state.accounts[index] = account; else state.accounts.push(account);
   const saved = persist(); form.reset(); renderAccounts();
-  announce(`Staff profile ${editing ? 'updated' : 'created'}${saved ? ' in this browser' : ' for this session only (storage unavailable)'}. Demo passwords are not stored; this does not create a real login.`);
+  announce(`Staff profile ${editing ? 'updated' : 'created'}${saved ? ' in this browser' : ' for this session only (storage unavailable)'}. Passwords are not stored; sign-in access is not enabled.`);
 });
 function renderAccounts() {
   const area = $('#account-results');
@@ -167,7 +166,10 @@ $('#account-results').addEventListener('click', event => {
   const button = event.target.closest('[data-edit]'); if (!button) return;
   const account = state.accounts.find(a => a.id === button.dataset.edit); if (!account) return;
   const form = $('#account-form'); form.reset();
-  Object.entries(account).forEach(([key,value]) => { if (form.elements.namedItem(key)) form.elements.namedItem(key).value = value; });
+  Object.entries(account).forEach(([key,value]) => {
+    const control = form.elements.namedItem(key === 'id' ? 'accountId' : key);
+    if (control) control.value = value;
+  });
   $('#a-password').required = false; $('#a-confirm').required = false;
   $('#account-form-title').textContent = `Edit ${account.first}’s account`; $('#a-first').focus();
 });
@@ -202,7 +204,7 @@ $('#report-form').addEventListener('submit', event => {
   const filters = dataOf(form);
   const rows = filters.category === 'reservations' ? filteredReservations(filters).map(r => ({...r,status:bookingStatus(r)})) : [];
   report = {filters,rows,generated:new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium',timeStyle:'short'}).format(new Date())};
-  $('#report-preview').innerHTML = `<p class="eyebrow">SOY & SESAME · DEMO REPORT</p><h2>${escapeHTML(filters.title)}</h2><p class="muted">${escapeHTML(filters.branch || 'All branches')} · ${escapeHTML(filters.start)} to ${escapeHTML(filters.end)} · ${escapeHTML(filters.status || 'All statuses')}<br>Generated ${escapeHTML(report.generated)} (Manila time)</p><div class="report-stats"><div><strong>${rows.length}</strong><span>Records</span></div>${filters.category === 'reservations' ? `<div><strong>${rows.reduce((total,r) => total+r.guests,0)}</strong><span>Total guests</span></div>` : ''}</div><div class="table-wrap">${filters.category === 'reservations' ? reservationTable(rows) : '<p class="empty">No '+escapeHTML(filters.category)+' data is available. This browser demo does not collect payments or import POS sales.</p>'}</div><p class="muted">Student prototype · Local demo data only · Not an official financial statement.</p>`;
+  $('#report-preview').innerHTML = `<p class="eyebrow">SOY & SESAME · REPORT</p><h2>${escapeHTML(filters.title)}</h2><p class="muted">${escapeHTML(filters.branch || 'All branches')} · ${escapeHTML(filters.start)} to ${escapeHTML(filters.end)} · ${escapeHTML(filters.status || 'All statuses')}<br>Generated ${escapeHTML(report.generated)} (Manila time)</p><div class="report-stats"><div><strong>${rows.length}</strong><span>Records</span></div>${filters.category === 'reservations' ? `<div><strong>${rows.reduce((total,r) => total+r.guests,0)}</strong><span>Total guests</span></div>` : ''}</div><div class="table-wrap">${filters.category === 'reservations' ? reservationTable(rows) : '<p class="empty">No '+escapeHTML(filters.category)+' data is available. No payment transactions or POS sales have been recorded.</p>'}</div><p class="muted">Generated from records saved in this browser. Not an official financial statement.</p>`;
   $('#export-report').disabled = false; announce('Report generated. You can now export the preview.');
 });
 // Prefix spreadsheet formulas to prevent user-entered text being evaluated on CSV open.
@@ -222,13 +224,13 @@ $('#export-report').addEventListener('click', () => {
 });
 forms.forEach(form => form.addEventListener('reset', () => {
   clearErrors(form);
-  if (form.id === 'account-form') {
-    form.elements.id.value = ''; $('#a-password').required = true; $('#a-confirm').required = true; $('#account-form-title').textContent = 'Add staff account';
+  if (form.matches('#account-form')) {
+    form.elements.namedItem('accountId').value = ''; $('#a-password').required = true; $('#a-confirm').required = true; $('#account-form-title').textContent = 'Add staff account';
   }
   setTimeout(() => {
-    if (form.id === 'reservation-form') refreshTables();
-    if (form.id === 'search-form') renderSearch();
-    if (form.id === 'report-form') {setReportDates(); invalidateReport();}
+    if (form.matches('#reservation-form')) refreshTables();
+    if (form.matches('#search-form')) renderSearch();
+    if (form.matches('#report-form')) {setReportDates(); invalidateReport();}
   },0);
 }));
 function showPage(id, focus = false) {

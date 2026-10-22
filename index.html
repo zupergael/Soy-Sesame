@@ -15,7 +15,7 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <aside class="sidebar">
-    <a class="brand" href="#reservation" aria-label="Soy and Sesame home"><span class="brand-mark">S<span>&</span>S</span><strong>SOY & SESAME</strong><small>GOOD COMPANY. GREAT EVENINGS.</small></a>
+    <a class="brand" href="#reservation" aria-label="Soy and Sesame home"><img class="brand-logo" src="assets/soy-sesame-logo.png" width="447" height="447" alt="Soy & Sesame — Bar and Kitchen"></a>
     <p class="nav-label">YOUR WORKSPACE</p>
     <nav aria-label="Main navigation">
       <button type="button" data-page="reservation" aria-current="page"><span>01</span> Table reservation</button>
@@ -27,7 +27,7 @@
   </aside>
   <div class="workspace">
     <header class="theme-toolbar">
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode"><span id="theme-icon" aria-hidden="true">☀</span><span id="theme-label">Light mode</span></button>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode"><span id="theme-icon" aria-hidden="true">☀</span></button>
     </header>
     <main id="main" tabindex="-1">
       <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
@@ -49,7 +49,7 @@
               <div class="field"><label for="r-phone">Mobile number</label><input id="r-phone" name="phone" type="tel" autocomplete="tel" pattern="(09[0-9]{9}|\+639[0-9]{9})" placeholder="09171234567" required aria-describedby="phone-help"><small id="phone-help">Use 09XXXXXXXXX or +639XXXXXXXXX.</small></div>
               <div class="field full"><label for="r-notes">Special requests <span>(optional)</span></label><textarea id="r-notes" name="notes" rows="3" maxlength="300" placeholder="Anything you’d like us to know? Requests are subject to availability."></textarea></div>
             </div>
-            <div class="field check-field"><label><input id="r-terms" name="terms" type="checkbox" required> I understand this demo does not confirm or pay for a booking.</label></div>
+            <div class="field check-field"><label><input id="r-terms" name="terms" type="checkbox" required> I understand that saving a reservation does not confirm payment.</label></div>
             <div class="field check-field"><label><input id="r-marketing" name="marketing" type="checkbox"> Email me about events and offers (optional).</label></div>
             <div class="form-actions"><button class="primary" type="submit">Save reservation <span aria-hidden="true">↗</span></button><button class="secondary" type="reset">Clear form</button></div>
             <p class="form-note">Saved bookings remain pending payment. No payment is collected.</p>
@@ -78,15 +78,15 @@
               <figcaption><h2 id="branch-layout-title">Your branch, at a glance.</h2><p id="branch-layout-help">Select a branch to view its table layout.</p></figcaption>
               <a id="branch-layout-link" hidden target="_blank" rel="noopener" aria-describedby="branch-layout-help"><img id="branch-layout-image" width="1080" height="1920" alt=""></a>
             </figure>
-            <div class="summary-card"><p class="eyebrow">BEFORE YOU BOOK</p><h2>A little heads-up.</h2><dl><div><dt>Reservation fee</dt><dd>₱1,000</dd></div><div><dt>Online payment options</dt><dd>GCash / Maya</dd></div><div><dt>Booking window</dt><dd>Up to 21 days</dd></div></dl><p>In the full system, PayMongo confirms the reservation fee. This prototype saves a 15-minute demo hold only.</p></div>
+            <div class="summary-card"><p class="eyebrow">BEFORE YOU BOOK</p><h2>A little heads-up.</h2><dl><div><dt>Reservation fee</dt><dd>₱1,000</dd></div><div><dt>Online payment options</dt><dd>GCash / Maya</dd></div><div><dt>Booking window</dt><dd>Up to 21 days</dd></div></dl><p>Your table is held for 15 minutes while payment is pending. Saving this form does not collect payment.</p></div>
           </aside>
         </div>
       </section>
       <section id="accounts" class="page" aria-labelledby="accounts-title" hidden>
         <div class="page-heading"><div><h1 id="accounts-title">The people<br><em>behind the evening.</em></h1><p>Create and update staff profiles for the two branches.</p></div></div>
         <form id="account-form" class="card" novalidate>
-          <div class="card-heading"><span class="step">02</span><div><h2 id="account-form-title">Add staff account</h2><p>Demo profiles only. Passwords are validated, then discarded.</p></div></div>
-          <input name="id" type="hidden">
+          <div class="card-heading"><span class="step">02</span><div><h2 id="account-form-title">Add staff account</h2><p>Profiles are saved in this browser. Passwords are not stored.</p></div></div>
+          <input name="accountId" type="hidden">
           <div class="form-grid">
             <div class="field"><label for="a-first">First name</label><input id="a-first" name="first" minlength="2" maxlength="50" autocomplete="given-name" placeholder="First name" required></div>
             <div class="field"><label for="a-last">Last name</label><input id="a-last" name="last" minlength="2" maxlength="50" autocomplete="family-name" placeholder="Last name" required></div>
@@ -94,8 +94,8 @@
             <div class="field"><label for="a-role">Access role</label><select id="a-role" name="role" required><option value="">Choose a role</option><option>Staff</option><option>Branch Manager</option><option>System Administrator / Owner</option></select></div>
             <div class="field"><label for="a-branch">Assigned branch</label><select id="a-branch" name="branch" required><option value="">Choose a branch</option><option>Padre Campa</option><option>S.H. Loyola</option><option>Both branches</option></select></div>
             <div class="field"><label for="a-status">Account status</label><select id="a-status" name="status" required><option>Active</option><option>Inactive</option></select></div>
-            <div class="field"><label for="a-password">Demo password</label><input id="a-password" name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" placeholder="At least 12 characters" required aria-describedby="password-help"><small id="password-help">Use a made-up password. Leave blank when editing to skip.</small></div>
-            <div class="field"><label for="a-confirm">Confirm demo password</label><input id="a-confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Repeat the demo password" required></div>
+            <div class="field"><label for="a-password">Password</label><input id="a-password" name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" placeholder="At least 12 characters" required aria-describedby="password-help"><small id="password-help">At least 12 characters. Leave blank when editing to skip.</small></div>
+            <div class="field"><label for="a-confirm">Confirm password</label><input id="a-confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Repeat the password" required></div>
           </div>
           <div class="form-actions"><button class="primary" type="submit">Save account <span aria-hidden="true">↗</span></button><button class="secondary" type="reset">Clear / cancel edit</button></div>
         </form>
