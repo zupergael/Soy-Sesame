@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Soy & Sesame reservations and branch management.">
+  <title>Soy & Sesame · Reservations & Management</title>
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('soy-sesame-theme') === 'light' ? 'light' : 'dark'; }
+    catch (_) { document.documentElement.dataset.theme = 'dark'; }
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <aside class="sidebar">
+    <a class="brand" href="#reservation" aria-label="Soy and Sesame home"><span class="brand-mark">S<span>&</span>S</span><strong>SOY & SESAME</strong><small>GOOD COMPANY. GREAT EVENINGS.</small></a>
+    <p class="nav-label">YOUR WORKSPACE</p>
+    <nav aria-label="Main navigation">
+      <button type="button" data-page="reservation" aria-current="page"><span>01</span> Table reservation</button>
+      <button type="button" data-page="accounts"><span>02</span> Staff accounts</button>
+      <button type="button" data-page="search"><span>03</span> Search & filter</button>
+      <button type="button" data-page="reports"><span>04</span> Reports & exports</button>
+    </nav>
+    <div class="sidebar-bottom"><p>Padre Campa & S.H. Loyola<br>Manila, Philippines</p></div>
+  </aside>
+  <div class="workspace">
+    <header class="theme-toolbar">
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode"><span id="theme-icon" aria-hidden="true">☀</span><span id="theme-label">Light mode</span></button>
+    </header>
+    <main id="main" tabindex="-1">
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      <section id="reservation" class="page" aria-labelledby="reservation-title">
+        <div class="page-heading"><div><h1 id="reservation-title">Make room for a<br><em>good evening.</em></h1><p>Pick your branch, choose a table, and we’ll save your details.</p></div><span class="heading-badge">A seat at the table<br><strong>starts here.</strong></span></div>
+        <div class="reservation-layout">
+          <form id="reservation-form" class="card" novalidate>
+            <div class="card-heading"><span class="step">01</span><div><h2>Your reservation</h2><p>All fields are required unless marked optional.</p></div></div>
+            <div class="form-grid">
+              <div class="field"><label for="r-branch">Branch</label><select id="r-branch" name="branch" required><option value="">Choose a branch</option><option>Padre Campa</option><option>S.H. Loyola</option></select></div>
+              <div class="field"><label for="r-date">Reservation date</label><input id="r-date" name="date" type="date" required aria-describedby="date-help"><small id="date-help">Book today or up to 3 weeks ahead.</small></div>
+              <div class="field"><label for="r-guests">Number of guests</label><input id="r-guests" name="guests" type="number" min="1" max="8" step="1" placeholder="e.g. 4" required></div>
+              <div class="field"><label for="r-table">Table</label><select id="r-table" name="table" required aria-describedby="table-help"><option value="">Choose branch and date first</option></select><small id="table-help">Tables are filtered by capacity and availability. S tables cannot be reserved.</small></div>
+            </div>
+            <div class="section-divider"><span class="step">02</span><h2>A few details about you</h2></div>
+            <div class="form-grid">
+              <div class="field full"><label for="r-name">Full name</label><input id="r-name" name="name" autocomplete="name" minlength="2" maxlength="80" placeholder="Juan dela Cruz" required></div>
+              <div class="field"><label for="r-email">Email address</label><input id="r-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="juan@example.com" required></div>
+              <div class="field"><label for="r-phone">Mobile number</label><input id="r-phone" name="phone" type="tel" autocomplete="tel" pattern="(09[0-9]{9}|\+639[0-9]{9})" placeholder="09171234567" required aria-describedby="phone-help"><small id="phone-help">Use 09XXXXXXXXX or +639XXXXXXXXX.</small></div>
+              <div class="field full"><label for="r-notes">Special requests <span>(optional)</span></label><textarea id="r-notes" name="notes" rows="3" maxlength="300" placeholder="Anything you’d like us to know? Requests are subject to availability."></textarea></div>
+            </div>
+            <div class="field check-field"><label><input id="r-terms" name="terms" type="checkbox" required> I understand this demo does not confirm or pay for a booking.</label></div>
+            <div class="field check-field"><label><input id="r-marketing" name="marketing" type="checkbox"> Email me about events and offers (optional).</label></div>
+            <div class="form-actions"><button class="primary" type="submit">Save reservation <span aria-hidden="true">↗</span></button><button class="secondary" type="reset">Clear form</button></div>
+            <p class="form-note">Saved bookings remain pending payment. No payment is collected.</p>
+          </form>
+          <aside class="reservation-aside">
+            <div class="evening-art cocktail-art" role="img" aria-label="Illustration of a ruby cocktail with a citrus garnish. Gather, sip, stay a while. Soy & Sesame, your next favorite evening.">
+              <span class="art-label" aria-hidden="true">GATHER. SIP. STAY A WHILE.</span>
+              <svg class="cocktail-illustration" viewBox="0 0 260 240" aria-hidden="true" focusable="false">
+                <ellipse cx="132" cy="217" rx="65" ry="10" fill="#351019" opacity=".22"/>
+                <path d="M130 133V211M99 214H161" fill="none" stroke="#f1dfb9" stroke-width="7" stroke-linecap="round"/>
+                <path d="M48 61H212L145 139Q130 155 115 139Z" fill="#efd5ab" fill-opacity=".17" stroke="#f1dfb9" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M64 77H196L141 138Q130 150 119 138Z" fill="#d75a64"/>
+                <path d="M64 77H196" stroke="#f4b2a2" stroke-width="4" stroke-linecap="round"/>
+                <rect x="95" y="83" width="22" height="22" rx="5" transform="rotate(17 106 94)" fill="#ffe9d0" opacity=".65"/>
+                <rect x="135" y="88" width="23" height="23" rx="5" transform="rotate(-15 146 99)" fill="#ffe9d0" opacity=".45"/>
+                <circle cx="193" cy="57" r="31" fill="#c59b5f" stroke="#f1dfb9" stroke-width="5"/>
+                <circle cx="193" cy="57" r="24" fill="#e7b975"/>
+                <path d="M193 34V80M170 57H216M177 41L209 73M177 73L209 41" stroke="#f8dfad" stroke-width="3"/>
+                <circle cx="193" cy="57" r="4" fill="#f8dfad"/>
+                <path d="M72 110L59 95" stroke="#fff2d4" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+                <path d="M42 27V41M35 34H49" stroke="#f1dfb9" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span class="art-bottom" aria-hidden="true">SOY & SESAME<br><i>your next favorite evening</i></span>
+            </div>
+            <figure class="branch-layout-card">
+              <figcaption><h2 id="branch-layout-title">Your branch, at a glance.</h2><p id="branch-layout-help">Select a branch to view its table layout.</p></figcaption>
+              <a id="branch-layout-link" hidden target="_blank" rel="noopener" aria-describedby="branch-layout-help"><img id="branch-layout-image" width="1080" height="1920" alt=""></a>
+            </figure>
+            <div class="summary-card"><p class="eyebrow">BEFORE YOU BOOK</p><h2>A little heads-up.</h2><dl><div><dt>Reservation fee</dt><dd>₱1,000</dd></div><div><dt>Online payment options</dt><dd>GCash / Maya</dd></div><div><dt>Booking window</dt><dd>Up to 21 days</dd></div></dl><p>In the full system, PayMongo confirms the reservation fee. This prototype saves a 15-minute demo hold only.</p></div>
+          </aside>
+        </div>
+      </section>
+      <section id="accounts" class="page" aria-labelledby="accounts-title" hidden>
+        <div class="page-heading"><div><h1 id="accounts-title">The people<br><em>behind the evening.</em></h1><p>Create and update staff profiles for the two branches.</p></div></div>
+        <form id="account-form" class="card" novalidate>
+          <div class="card-heading"><span class="step">02</span><div><h2 id="account-form-title">Add staff account</h2><p>Demo profiles only. Passwords are validated, then discarded.</p></div></div>
+          <input name="id" type="hidden">
+          <div class="form-grid">
+            <div class="field"><label for="a-first">First name</label><input id="a-first" name="first" minlength="2" maxlength="50" autocomplete="given-name" placeholder="First name" required></div>
+            <div class="field"><label for="a-last">Last name</label><input id="a-last" name="last" minlength="2" maxlength="50" autocomplete="family-name" placeholder="Last name" required></div>
+            <div class="field"><label for="a-email">Work email</label><input id="a-email" name="email" type="email" maxlength="120" autocomplete="email" placeholder="staff@example.com" required></div>
+            <div class="field"><label for="a-role">Access role</label><select id="a-role" name="role" required><option value="">Choose a role</option><option>Staff</option><option>Branch Manager</option><option>System Administrator / Owner</option></select></div>
+            <div class="field"><label for="a-branch">Assigned branch</label><select id="a-branch" name="branch" required><option value="">Choose a branch</option><option>Padre Campa</option><option>S.H. Loyola</option><option>Both branches</option></select></div>
+            <div class="field"><label for="a-status">Account status</label><select id="a-status" name="status" required><option>Active</option><option>Inactive</option></select></div>
+            <div class="field"><label for="a-password">Demo password</label><input id="a-password" name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" placeholder="At least 12 characters" required aria-describedby="password-help"><small id="password-help">Use a made-up password. Leave blank when editing to skip.</small></div>
+            <div class="field"><label for="a-confirm">Confirm demo password</label><input id="a-confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Repeat the demo password" required></div>
+          </div>
+          <div class="form-actions"><button class="primary" type="submit">Save account <span aria-hidden="true">↗</span></button><button class="secondary" type="reset">Clear / cancel edit</button></div>
+        </form>
+        <div class="card results-card"><h2>Staff directory</h2><p class="muted">Choose Edit to update an existing profile.</p><div id="account-results" class="table-wrap"></div></div>
+      </section>
+      <section id="search" class="page" aria-labelledby="search-title" hidden>
+        <div class="page-heading"><div><h1 id="search-title">Find the<br><em>details that matter.</em></h1><p>Search the reservation records saved in this browser.</p></div></div>
+        <form id="search-form" class="card" novalidate>
+          <div class="form-grid three">
+            <div class="field"><label for="s-query">Name or email <span>(optional)</span></label><input id="s-query" name="query" maxlength="100" placeholder="Search a guest…"></div>
+            <div class="field"><label for="s-ref">Reservation reference <span>(optional)</span></label><input id="s-ref" name="reference" maxlength="50" placeholder="SS-…"></div>
+            <div class="field"><label for="s-branch">Branch</label><select id="s-branch" name="branch"><option value="">All branches</option><option>Padre Campa</option><option>S.H. Loyola</option></select></div>
+            <div class="field"><label for="s-start">From date <span>(optional)</span></label><input id="s-start" name="start" type="date"></div>
+            <div class="field"><label for="s-end">To date <span>(optional)</span></label><input id="s-end" name="end" type="date"></div>
+            <div class="field"><label for="s-status">Booking status</label><select id="s-status" name="status"><option value="">All statuses</option><option>Pending payment</option><option>Expired</option></select></div>
+            <div class="field"><label for="s-guests">Minimum guests <span>(optional)</span></label><input id="s-guests" name="minGuests" type="number" min="1" max="8" step="1" placeholder="1–8"></div>
+            <div class="field"><label for="s-sort">Sort by</label><select id="s-sort" name="sort"><option value="date-asc">Reservation date: earliest</option><option value="date-desc">Reservation date: latest</option><option value="name">Guest name: A–Z</option></select></div>
+          </div>
+          <div class="form-actions"><button class="primary" type="submit">Search reservations <span aria-hidden="true">↗</span></button><button class="secondary" type="reset">Reset filters</button></div>
+        </form>
+        <div class="card results-card"><h2 id="search-count" aria-live="polite">Reservation results</h2><div id="search-results" class="table-wrap"></div></div>
+      </section>
+      <section id="reports" class="page" aria-labelledby="reports-title" hidden>
+        <div class="page-heading"><div><h1 id="reports-title">A clearer view<br><em>of your business.</em></h1><p>Filter your records, preview a report, and take it with you.</p></div></div>
+        <form id="report-form" class="card" novalidate>
+          <div class="form-grid three">
+            <div class="field"><label for="p-title">Report title</label><input id="p-title" name="title" minlength="3" maxlength="80" value="Reservation activity report" required></div>
+            <div class="field"><label for="p-branch">Branch</label><select id="p-branch" name="branch"><option value="">All branches</option><option>Padre Campa</option><option>S.H. Loyola</option></select></div>
+            <div class="field"><label for="p-category">Report category</label><select id="p-category" name="category" required><option value="reservations">Reservations</option><option value="payments">Payment transactions</option><option value="sales">Sales performance</option></select></div>
+            <div class="field"><label for="p-start">From date</label><input id="p-start" name="start" type="date" required></div>
+            <div class="field"><label for="p-end">To date</label><input id="p-end" name="end" type="date" required></div>
+            <div class="field"><label for="p-status">Booking status</label><select id="p-status" name="status"><option value="">All statuses</option><option>Pending payment</option><option>Expired</option></select></div>
+            <div class="field"><label for="p-sort">Sort order</label><select id="p-sort" name="sort"><option value="date-asc">Date: earliest first</option><option value="date-desc">Date: latest first</option><option value="name">Guest name: A–Z</option></select></div>
+            <div class="field"><label for="p-format">Export format</label><select id="p-format" name="format"><option value="csv">CSV spreadsheet</option><option value="pdf">Print / Save as PDF</option></select></div>
+          </div>
+          <div class="form-actions"><button class="primary" type="submit">Generate report <span aria-hidden="true">↗</span></button><button id="export-report" class="secondary" type="button" disabled>Export report</button><button class="secondary" type="reset">Reset report</button></div>
+          <p class="form-note">Payments and sales will be empty until a backend is connected. PDF export uses your browser’s print dialog.</p>
+        </form>
+        <div id="report-preview" class="card results-card"><h2>Your report preview</h2><p class="empty">Choose your filters and generate a report to get started.</p></div>
+      </section>
+      <footer>SOY & SESAME</footer>
+    </main>
+  </div>
+</body>
+</html>
