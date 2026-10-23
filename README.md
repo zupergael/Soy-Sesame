@@ -2,6 +2,12 @@
 
 Open `index.html` in a browser, or use Antigravity's local preview extension. No build or package installation is required. Edit `index.html`, `styles.css`, and `app.js` in Antigravity.
 
+## Detailed documentation
+
+- [User guide](docs/USER_GUIDE.md): setup, step-by-step workflows, validation rules, and troubleshooting.
+- [Technical description](docs/TECHNICAL_DESCRIPTION.md): architecture, stored records, table configuration, exports, and implementation limits.
+- [Manual testing checklist](docs/TESTING.md): expected behavior and a suggested demonstration sequence.
+
 ## Four assignment forms
 
 | Form | Classification | Controls (including buttons) |
