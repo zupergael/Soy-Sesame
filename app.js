@@ -9,7 +9,7 @@ function syncThemeToggle() {
 $('#theme-toggle').addEventListener('click', () => {
   const theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
   document.documentElement.dataset.theme = theme;
-  try { localStorage.setItem('soy-sesame-theme', theme); } catch (_) { /* Theme still works for this session. */ }
+  try { localStorage.setItem('soy-sesame-theme', theme); } catch (err) { console.warn('Theme storage unavailable:', err); }
   syncThemeToggle();
 });
 syncThemeToggle();
@@ -61,7 +61,13 @@ function dateString(offset = 0) {
 }
 function refreshDates() { $('#r-date').min = dateString(); $('#r-date').max = dateString(21); }
 function setReportDates() { $('#p-start').value = dateString(); $('#p-end').value = dateString(21); }
-const bookingStatus = r => r.expiresAt > Date.now() ? 'Pending payment' : 'Expired';
+const bookingStatus = r => r.status || (r.expiresAt > Date.now() ? 'Pending payment' : 'Expired');
+const isTableOccupied = (r, branch, date, tableId) =>
+  r.branch === branch &&
+  r.date === date &&
+  r.table === tableId &&
+  r.status !== 'Cancelled' &&
+  r.expiresAt > Date.now();
 const dataOf = form => Object.fromEntries(new FormData(form));
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function clearErrors(form) {
@@ -77,7 +83,8 @@ function clearErrors(form) {
 function validate(form, custom = () => {}) {
   clearErrors(form);
   [...form.elements].forEach(el => {
-    if (['text','email','tel'].includes(el.type)) el.value = el.value.trim();
+    if (['text','email'].includes(el.type)) el.value = el.value.trim();
+    if (el.type === 'tel') el.value = el.value.trim().replace(/[\s-]/g, '');
   });
   custom();
   let first;
@@ -95,9 +102,17 @@ function validate(form, custom = () => {}) {
   if (first) { first.focus(); announce('Please correct the highlighted fields before submitting.', true); return false; }
   return true;
 }
-function validateRange(form) {
+function validateRange(form, maxDays = null) {
   const {start, end} = form.elements;
-  if (start.value && end.value && start.value > end.value) end.setCustomValidity('The end date must be on or after the start date.');
+  if (!start.value || !end.value) return;
+  if (start.value > end.value) {
+    end.setCustomValidity('The end date must be on or after the start date.');
+    return;
+  }
+  if (maxDays) {
+    const diffDays = (new Date(end.value) - new Date(start.value)) / (1000 * 60 * 60 * 24);
+    if (diffDays > maxDays) end.setCustomValidity(`The date range cannot exceed ${maxDays} days.`);
+  }
 }
 function refreshTables() {
   refreshDates();
@@ -116,7 +131,7 @@ function refreshTables() {
   select.replaceChildren(new Option(branch && date ? 'Choose an available table' : 'Choose branch and date first',''));
   if (!branch || !date) return;
   (BRANCH_TABLES[branch] || []).forEach(table => {
-    const occupied = state.reservations.some(r => r.branch === branch && r.date === date && r.table === table.id && bookingStatus(r) === 'Pending payment');
+    const occupied = state.reservations.some(r => isTableOccupied(r, branch, date, table.id));
     const option = new Option(`${table.id} · ${table.capacity} seats${occupied ? ' · held' : table.capacity < guests ? ' · too small' : ''}`, table.id);
     option.disabled = occupied || table.capacity < guests;
     select.add(option);
@@ -128,10 +143,13 @@ $('#reservation-form').addEventListener('submit', event => {
   event.preventDefault(); refreshDates();
   const form = event.currentTarget;
   if (!validate(form, () => {
-    const selected = (BRANCH_TABLES[form.elements.branch.value] || []).find(t => t.id === form.elements.table.value);
-    if (!selected && form.elements.table.value) form.elements.table.setCustomValidity('Choose a table belonging to this branch.');
-    if (selected && selected.capacity < Number(form.elements.guests.value)) form.elements.table.setCustomValidity('Choose a table with enough seats.');
-    if (state.reservations.some(r => r.branch === form.elements.branch.value && r.date === form.elements.date.value && r.table === form.elements.table.value && bookingStatus(r) === 'Pending payment')) form.elements.table.setCustomValidity('This table is currently held. Please choose another table.');
+    const f = form.elements;
+    const minDate = dateString(0), maxDate = dateString(21);
+    if (f.date.value && (f.date.value < minDate || f.date.value > maxDate)) f.date.setCustomValidity(`Please choose a date between ${minDate} and ${maxDate}.`);
+    const selected = (BRANCH_TABLES[f.branch.value] || []).find(t => t.id === f.table.value);
+    if (!selected && f.table.value) f.table.setCustomValidity('Choose a table belonging to this branch.');
+    if (selected && selected.capacity < Number(f.guests.value)) f.table.setCustomValidity('Choose a table with enough seats.');
+    if (state.reservations.some(r => isTableOccupied(r, f.branch.value, f.date.value, f.table.value))) f.table.setCustomValidity('This table is currently held. Please choose another table.');
   })) return;
   const data = dataOf(form);
   const reservation = {id:`SS-${crypto.randomUUID().slice(0,8).toUpperCase()}`,branch:data.branch,date:data.date,guests:Number(data.guests),table:data.table,name:data.name,email:data.email,phone:data.phone,notes:data.notes.trim(),marketing:data.marketing === 'on',createdAt:Date.now(),expiresAt:Date.now()+15*60*1000};
@@ -146,9 +164,15 @@ $('#account-form').addEventListener('submit', event => {
   if (!validate(form, () => {
     const f = form.elements;
     if (f.password.value !== f.confirm.value) f.confirm.setCustomValidity('The passwords must match.');
-    if (f.password.value && f.password.value.length < 12) f.password.setCustomValidity('Use at least 12 characters.');
+    if (f.password.value) {
+      const pwd = f.password.value;
+      const hasNonWhitespace = /\S/.test(pwd);
+      const hasComplexity = [/[A-Z]/, /[a-z]/, /[0-9]/, /[^A-Za-z0-9]/].filter(re => re.test(pwd)).length >= 2;
+      if (pwd.length < 12 || !hasNonWhitespace || !hasComplexity) f.password.setCustomValidity('Use at least 12 characters with a mix of letters, numbers, or symbols.');
+    }
     if (state.accounts.some(a => a.email.toLowerCase() === f.email.value.toLowerCase() && a.id !== f.namedItem('accountId').value)) f.email.setCustomValidity('An account already uses this email address.');
-    if (f.branch.value === 'Both branches' && f.role.value !== 'System Administrator / Owner') f.branch.setCustomValidity('Staff and branch managers must be assigned to one branch.');
+    const isAdmin = f.role.value === 'System Administrator / Owner';
+    if (f.branch.value === 'Both branches' && !isAdmin) f.branch.setCustomValidity('Staff and branch managers must be assigned to one branch.');
   })) return;
   const data = dataOf(form), editing = Boolean(data.accountId);
   const account = {id:data.accountId || crypto.randomUUID(),first:data.first,last:data.last,email:data.email,role:data.role,branch:data.branch,status:data.status};
@@ -200,7 +224,7 @@ function invalidateReport() {
 $('#report-form').addEventListener('input', invalidateReport);
 $('#report-form').addEventListener('submit', event => {
   event.preventDefault(); const form = event.currentTarget;
-  if (!validate(form, () => validateRange(form))) return;
+  if (!validate(form, () => validateRange(form, 90))) return;
   const filters = dataOf(form);
   const rows = filters.category === 'reservations' ? filteredReservations(filters).map(r => ({...r,status:bookingStatus(r)})) : [];
   report = {filters,rows,generated:new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium',timeStyle:'short'}).format(new Date())};
@@ -247,6 +271,13 @@ document.querySelectorAll('[data-page]').forEach(button => button.addEventListen
 window.addEventListener('hashchange', () => showPage(location.hash.slice(1),true));
 window.addEventListener('storage', event => {
   if (event.key !== STORAGE_KEY) return;
-  try { const next = JSON.parse(event.newValue); if (next && Array.isArray(next.reservations) && Array.isArray(next.accounts)) { state = next; refreshTables(); renderAccounts(); renderSearch(); invalidateReport(); } } catch (_) { /* Keep current records on malformed external changes. */ }
+  try {
+    const next = JSON.parse(event.newValue);
+    if (next && Array.isArray(next.reservations) && Array.isArray(next.accounts)) {
+      state = next; refreshTables(); renderAccounts(); renderSearch(); invalidateReport();
+    }
+  } catch (err) {
+    console.warn('Storage sync failed for external changes:', err);
+  }
 });
 refreshDates(); setReportDates(); refreshTables(); renderAccounts(); renderSearch(); showPage(location.hash.slice(1));
