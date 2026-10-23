@@ -17,7 +17,7 @@ h1 em{font-style:normal;font-weight:600}
 .brand-mark{font-weight:600;letter-spacing:-5px}
 .brand-mark span{font-style:normal}
 .heading-badge{transform:none;outline:none;border-color:var(--line);font-size:12px}
-.heading-badge strong{font-style:normal;font-weight:500;color:var(--ink)}
+.heading-badge strong{font-style:normal;font-weight:490;color:var(--ink)}
 .card,.summary-card{border-radius:20px}
 .card-heading h2,.section-divider h2,h2{letter-spacing:-.025em}
 .summary-card h2{font-weight:600}
@@ -79,7 +79,7 @@ main{padding-top:30px}
 [data-theme="light"] .summary-card{background:#eeece1}
 [data-theme="light"] th{background:#f3f0e7}
 [data-theme="light"] .status{background:#f0e6d3;color:#805d2b}
-[data-theme="light"] .notice{border-color:#bacdbf;background:#eff5ee;color:#325541}
+[data-theme="light"] .notice{border-color:#bacdbf;background:#eff5ee;color:#325542}
 [data-theme="light"] .notice.error{border-color:#ddb3b8;background:#fff0f1;color:var(--error)}
 [data-theme="light"] footer{color:#82796c}
 [data-theme="light"] .skip{background:#fffefa;color:#302d29}
@@ -101,3 +101,238 @@ select,[data-theme="light"] select{-webkit-appearance:none;appearance:none;paddi
 [data-theme="light"] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Cpath d='m4 6.5 5 5 5-5' fill='none' stroke='%23615b52' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 @media(max-width:850px){.brand-logo{width:110px}.brand{align-items:center}}
 @media(forced-colors:active){select,[data-theme="light"] select{appearance:auto;background-image:none}.brand-logo{forced-color-adjust:none}}
+/* ==========================================================================
+   Soy & Sesame — Hover & Micro-Interaction Animations
+   ========================================================================== */
+
+/* 1. Global Transitions for Interactive Controls */
+button,
+a,
+input,
+select,
+textarea,
+.step,
+.theme-toggle,
+.heading-badge,
+.report-stats > div,
+table tbody tr {
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.4, 1),
+              box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.4, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease,
+              filter 0.2s ease;
+  will-change: transform;
+}
+
+/* 2. Primary & Action Buttons */
+.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -4px rgba(237, 52, 62, 0.45);
+}
+
+.primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(237, 52, 62, 0.3);
+}
+
+.secondary:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  border-color: #55555c;
+  color: var(--ink);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.secondary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+[data-theme="light"] .primary:hover:not(:disabled) {
+  box-shadow: 0 6px 16px -4px rgba(113, 47, 58, 0.35);
+}
+
+[data-theme="light"] .secondary:hover:not(:disabled) {
+  border-color: #beb8ab;
+  color: var(--ink);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* 3. Navigation Sidebar Links */
+nav button {
+  position: relative;
+  overflow: hidden;
+}
+
+nav button:hover:not([aria-current]) {
+  transform: translateX(4px);
+  color: var(--ink);
+}
+
+nav button[aria-current]:hover {
+  filter: brightness(1.08);
+}
+
+nav button span {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+nav button:hover:not([aria-current]) span {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* 4. Theme Toggle Button */
+.theme-toggle:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+#theme-icon {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle:hover #theme-icon {
+  transform: rotate(18deg) scale(1.12);
+}
+
+/* 5. Inputs, Selects, & Textareas */
+input:not([type="checkbox"],[type="hidden"]):hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+  border-color: #64646a;
+}
+
+[data-theme="light"] input:not([type="checkbox"],[type="hidden"]):hover:not(:focus):not(:disabled),
+[data-theme="light"] select:hover:not(:focus):not(:disabled),
+[data-theme="light"] textarea:hover:not(:focus):not(:disabled) {
+  border-color: #aaa497;
+}
+
+input:not([type="checkbox"],[type="hidden"]):focus,
+select:focus,
+textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(237, 52, 62, 0.22);
+}
+
+[data-theme="light"] input:not([type="checkbox"],[type="hidden"]):focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+  box-shadow: 0 0 0 3px rgba(113, 47, 58, 0.18);
+}
+
+/* 6. Form Step Number Indicators */
+.field:hover .step,
+.card-heading:hover .step {
+  border-color: var(--wine);
+  transform: scale(1.06);
+}
+
+/* 7. Checkbox Label Hover */
+.check-field label {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.check-field label:hover {
+  color: var(--ink);
+}
+
+.check-field input:hover {
+  transform: scale(1.05);
+}
+
+/* 8. Table Rows & Action Buttons */
+table tbody tr {
+  cursor: default;
+}
+
+table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.035);
+}
+
+[data-theme="light"] table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.028);
+}
+
+table button[data-edit]:hover {
+  transform: translateY(-1px);
+  border-color: var(--wine);
+  color: var(--ink);
+}
+
+.status {
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+table tbody tr:hover .status {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* 9. Report Statistics Tiles */
+.report-stats > div {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: default;
+}
+
+.report-stats > div:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .report-stats > div:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* 10. Floor Plan / Branch Layout Preview Link */
+.branch-layout-card a {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.branch-layout-card a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.branch-layout-card a img {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+.branch-layout-card a:hover img {
+  transform: scale(1.015);
+}
+
+/* 11. Rotating Heading Badge Micro-tilt */
+.heading-badge:hover {
+  transform: rotate(12deg) scale(1.03);
+  border-color: var(--wine);
+}
+
+/* 12. Notice / Alert Banners */
+.notice:not([hidden]) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notice:not([hidden]):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* 13. Accessibility: Preserve Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+  }
+}
